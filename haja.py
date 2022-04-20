@@ -45,20 +45,20 @@ def print_full_table(data):
     print(table.to_string())
 
 
+def generate_empty_time_table(period_num):
+    days = ("Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday")
+    periods = ["" for i in range(period_num)]
+    return {day:periods.copy() for day in days}
+
+
 if __name__ == "__main__":
-
-    time_table = {
-       "Monday": [],
-       "Tuesday": [],
-       "Wednesday": []
-    }
-
 
     subjects = {}
     data = pd.read_excel('dataset.xlsx',sheet_name = 'Sheet2')
     data.set_index('days', inplace=True)
 
     days_index = list(data.index)
+    number_of_periods = len(data.columns)
 
     for i in range(len(data)):
         for j in range(len(data.columns)):
@@ -87,8 +87,27 @@ if __name__ == "__main__":
             separated_subjects[subject.code].append(subject)
 
     separated_subjects_arr = [separated_subjects[key] for key in separated_subjects.keys()]
-    possibilities = [i for i in itertools.product(*separated_subjects_arr)]
+    valid_possibilities = []
+    valid_time_tables = []
+    valid = True
 
-    print(len(possibilities))
+    # Find all the possibilities using cartesian product method
+    for possibility in itertools.product(*separated_subjects_arr):
+        valid = True
+        time_table = generate_empty_time_table(number_of_periods)
 
+        for subject in possibility:
 
+            for time_slot in subject.time_slots:
+
+                if time_table[time_slot.day][time_slot.period] == "":
+                    time_table[time_slot.day][time_slot.period] = f'{subject.code}({subject.group})'
+                else:
+                    valid = False
+                    continue
+
+            if not valid: continue
+
+        if valid:
+            valid_possibilities.append(possibility)
+            valid_time_tables.append(time_table)
