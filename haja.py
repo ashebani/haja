@@ -76,5 +76,19 @@ if __name__ == "__main__":
             else:
                 subjects[cell].time_slots.append(time_slot)
 
-                [[],[],[],[]]
+    separated_subjects = {}
+    for i in subjects.keys():
+        subject = subjects[i]
+
+        if subject.code not in separated_subjects.keys():
+            separated_subjects[subject.code] = [subject]
+
+        else:
+            separated_subjects[subject.code].append(subject)
+
+    separated_subjects_arr = [separated_subjects[key] for key in separated_subjects.keys()]
+    possibilities = [i for i in itertools.product(*separated_subjects_arr)]
+
+    print(len(possibilities))
+
 
