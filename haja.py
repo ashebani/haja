@@ -56,7 +56,9 @@ if __name__ == "__main__":
 
     subjects = {}
     # read the excel from the file.
-    data = pd.read_excel('dataset.xlsx',sheet_name = 'Sheet2')
+    data = pd.read_excel('dataset.xlsx',sheet_name = 'schedule') # Our studying schedule
+    my_subjects = pd.read_excel('dataset.xlsx', sheet_name = 'my subjects') # my subjects for this semester.
+
     data.set_index('days', inplace=True)
 
     days_index = list(data.index) # number of days in a study week.
@@ -84,11 +86,16 @@ if __name__ == "__main__":
     for i in subjects.keys():
         subject = subjects[i]
 
-        if subject.code not in separated_subjects.keys():
-            separated_subjects[subject.code] = [subject]
+        my_subjects_this_semester = my_subjects.subject.to_list() # Accept only the subjects that i have available this semester.
 
+        if subject.code not in my_subjects_this_semester:
+            continue
         else:
-            separated_subjects[subject.code].append(subject)
+            if subject.code not in separated_subjects.keys():
+                separated_subjects[subject.code] = [subject]
+
+            else:
+                separated_subjects[subject.code].append(subject)
 
     separated_subjects_arr = [separated_subjects[key] for key in separated_subjects.keys()]
     valid_possibilities = []
@@ -107,7 +114,7 @@ if __name__ == "__main__":
 
                 # This if statement checks if the period of a subject has not taken a place in the table,
                 # if so, it will accept the subject, else it will skip the subject.
-                if time_table[time_slot.day][time_slot.period] == "": the period
+                if time_table[time_slot.day][time_slot.period] == "": #the period
                     time_table[time_slot.day][time_slot.period] = f'{subject.code}({subject.group})'
                 else:
                     valid = False
@@ -122,6 +129,6 @@ if __name__ == "__main__":
 
     print(len(valid_time_tables)) # Print the number of valid possibilities.
     indexes = []
-    for i in range(1000):
+    for i in range(len(valid_time_tables)):
         time_table_preview = pd.DataFrame(valid_time_tables[i])
         print(time_table_preview.T, '\n')
